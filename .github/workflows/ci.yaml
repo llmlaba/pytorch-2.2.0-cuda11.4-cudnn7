@@ -1,0 +1,23 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
+      - name: docker build kepler container
+        run: |
+          docker build . --tag ghcr.io/llmlaba/pytorch-2.2.0-cuda11.4-cudnn7:latest
+      - name: Push kepler docker container
+        run: |
+          docker push ghcr.io/llmlaba/pytorch-2.2.0-cuda11.4-cudnn7:latest
