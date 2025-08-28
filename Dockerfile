@@ -29,4 +29,6 @@ RUN python3 -m pip install -r requirements.txt
 
 RUN python3 setup.py install
 
+WORKDIR /opt
+
 CMD ["python3", "/test_torch.py"]

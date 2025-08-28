@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  build-pytorch:
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -24,3 +24,23 @@ jobs:
       - name: Push kepler docker container
         run: |
           docker push ghcr.io/llmlaba/pytorch-2.2.0-cuda11.4-cudnn7:latest
+  build-bnb:
+    needs: build-pytorch
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
+      - name: docker build kepler bitsandbytes container
+        run: |
+          docker build . --file Dockerfile-bnb --tag ghcr.io/llmlaba/pytorch-2.2.0-cuda11.4-cudnn7:bnb
+      - name: Push kepler bitsandbytes docker container
+        run: |
+          docker push ghcr.io/llmlaba/pytorch-2.2.0-cuda11.4-cudnn7:bnb

@@ -1,0 +1,22 @@
+FROM ghcr.io/llmlaba/pytorch-2.2.0-cuda11.4-cudnn7:latest
+
+ARG BNB_BRANCH=0.44.1
+
+USER root
+
+WORKDIR /opt
+
+RUN git clone --branch ${BNB_BRANCH} https://github.com/bitsandbytes-foundation/bitsandbytes.git
+
+WORKDIR /opt/bitsandbytes
+
+COPY requirements-bnb.txt ./requirements-bnb.txt
+
+RUN python3 -m pip install -r requirements-bnb.txt && \
+    cmake -DNO_CUBLASLT=true -DCOMPUTE_BACKEND=cuda -S . && \
+    make && \
+    pip3 install .
+
+WORKDIR /opt
+
+CMD ["python3", "-m", "bitsandbytes"]
